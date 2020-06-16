@@ -8,12 +8,8 @@ class Pokemon extends Component {
     this.state = {
       name: "",
       id: null,
-      types: []
+      types: [],
     };
-  }
-
-  componentWillMount() {
-
   }
 
   renderTypes(types) {
@@ -45,14 +41,10 @@ class Pokemon extends Component {
   }
 
   render() {
-    fetch(this.props.url)
-    .then((response) => response.json())
-    .then((data) => {
-      this.setState({name:data.name, id:data.id, types:data.types});
-    });
-    const types = this.renderTypes(this.state.types);
     const plusIcon = this.renderPlusIcon();
-    const url = "https://pokeres.bastionbot.org/images/pokemon/" + this.state.id + ".png"
+  
+    const types = this.renderTypes(this.props.types);
+    const url = "https://pokeres.bastionbot.org/images/pokemon/" + this.props.id + ".png"
     return (
       <div className="pokemon-container">
         <div className="left-side">
@@ -61,7 +53,7 @@ class Pokemon extends Component {
           </div>
           <div className="info-container">
             <div className="name-container">
-              {this.state.name.toUpperCase()}
+              {this.props.name.toUpperCase()}
             </div>
             {types}
           </div>

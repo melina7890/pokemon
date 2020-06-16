@@ -18,15 +18,14 @@ class App extends Component {
     console.log(search);
     const lowerCaseSearch = search.toLowerCase();
 
-    if (search == "" || !this.state.isSearching) {
+    if (search == "") {
       this.setState({pokemonToShow: this.state.allPokemon});
     } else {
       let list = [];
       this.state.allPokemon.forEach((pokemon) => {
-        console.log(pokemon.name);
-        console.log(pokemon.name.toLowerCase().indexOf(lowerCaseSearch));
         if(pokemon.name.toLowerCase().indexOf(lowerCaseSearch) > -1) {
-          console.log(pokemon.name + "here");
+          console.log(pokemon.name);
+          console.log(pokemon.name.toLowerCase().indexOf(lowerCaseSearch));
           list.push(pokemon);
         }
       });
@@ -36,7 +35,8 @@ class App extends Component {
   }
 
   changeSearchState(searchState) {
-    this.setState({isSearching: searchState});
+    this.setState({isSearching: !searchState});
+    console.log(searchState)
   }
 
   componentDidMount() {
@@ -47,16 +47,27 @@ class App extends Component {
     fetch('https://pokeapi.co/api/v2/pokemon?limit=20')
     .then((response) => response.json())
     .then((allpokemon) => {
-      this.setState({allPokemon: allpokemon.results, pokemonToShow: allpokemon.results});
-    })
+      let list = [];
+      allpokemon.results.forEach((pokemon) => {
+        fetch(pokemon.url)
+        .then((response) => response.json())
+        .then((data) => {
+          let pokemonData = {'name': data.name, 'id':data.id, 'types':data.types }
+          list.push(pokemonData);
+        });
+      });
+      this.setState({allPokemon: list, pokemonToShow:list});
+    });
   }
 
   renderAllPokemon(){
     let list = [];
-    console.log(this.state.pokemonToShow + "renderall")
-      this.state.pokemonToShow.forEach((pokemon) => {
-        list.push(<Pokemon url={pokemon.url}/>);
-      })
+    // if(!this.state.isSearching) {
+    //   this.setState({pokemonToShow:this.state.allPokemon});
+    // }
+    this.state.pokemonToShow.forEach((pokemon) => {
+      list.push(<Pokemon name={pokemon.name} id={pokemon.id} types={pokemon.types}/>);
+    })
     return (
       <div>
         {list}
