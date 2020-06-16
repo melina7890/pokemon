@@ -14,8 +14,8 @@ class App extends Component {
     };
   }
 
+  // search for pokemon if the search string is IN the pokemon name
   searchPokemon(search) {
-    console.log(search);
     const lowerCaseSearch = search.toLowerCase();
 
     if (search == "") {
@@ -24,19 +24,18 @@ class App extends Component {
       let list = [];
       this.state.allPokemon.forEach((pokemon) => {
         if(pokemon.name.toLowerCase().indexOf(lowerCaseSearch) > -1) {
-          console.log(pokemon.name);
-          console.log(pokemon.name.toLowerCase().indexOf(lowerCaseSearch));
           list.push(pokemon);
         }
       });
-      console.log(list);
       this.setState({pokemonToShow: list});
     }
   }
 
   changeSearchState(searchState) {
-    this.setState({isSearching: !searchState});
-    console.log(searchState)
+    this.setState({isSearching: searchState});
+    if(!this.state.isSearching) {
+      this.searchPokemon("");
+    }
   }
 
   componentDidMount() {
@@ -47,24 +46,22 @@ class App extends Component {
     fetch('https://pokeapi.co/api/v2/pokemon?limit=20')
     .then((response) => response.json())
     .then((allpokemon) => {
-      let list = [];
       allpokemon.results.forEach((pokemon) => {
         fetch(pokemon.url)
         .then((response) => response.json())
         .then((data) => {
           let pokemonData = {'name': data.name, 'id':data.id, 'types':data.types }
-          list.push(pokemonData);
+          this.setState({
+            pokemonToShow: this.state.pokemonToShow.concat(pokemonData),
+            allPokemon: this.state.allPokemon.concat(pokemonData)
+          });
         });
       });
-      this.setState({allPokemon: list, pokemonToShow:list});
     });
   }
 
   renderAllPokemon(){
     let list = [];
-    // if(!this.state.isSearching) {
-    //   this.setState({pokemonToShow:this.state.allPokemon});
-    // }
     this.state.pokemonToShow.forEach((pokemon) => {
       list.push(<Pokemon name={pokemon.name} id={pokemon.id} types={pokemon.types}/>);
     })
